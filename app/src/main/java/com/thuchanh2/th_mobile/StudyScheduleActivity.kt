@@ -1,21 +1,34 @@
 package com.thuchanh2.th_mobile
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.thuchanh2.th_mobile.data.database.AppDatabase
+import com.thuchanh2.th_mobile.data.entity.AccountRole
 import com.thuchanh2.th_mobile.data.entity.ScheduleStatus
+import com.thuchanh2.th_mobile.data.entity.StudySchedule
+import com.thuchanh2.th_mobile.databinding.ActivityStudyScheduleBinding
+import com.thuchanh2.th_mobile.databinding.DialogBookScheduleBinding
+import com.thuchanh2.th_mobile.notifications.ScheduleReminders
 import com.thuchanh2.th_mobile.repository.StudyScheduleRepository
+import com.thuchanh2.th_mobile.ui.*
 import com.thuchanh2.th_mobile.ui.adapter.StudyScheduleAdapter
+import com.thuchanh2.th_mobile.ui.calendar.CalendarFragment
+import com.thuchanh2.th_mobile.ui.notification.NotificationFragment
 import com.thuchanh2.th_mobile.viewmodel.StudyScheduleViewModel
 import com.thuchanh2.th_mobile.viewmodel.StudyScheduleViewModelFactory
 import kotlinx.coroutines.launch
@@ -23,128 +36,184 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class StudyScheduleActivity : AppCompatActivity() {
+class StudyScheduleActivity : ProtectedActivity() {
+    override val adminOnly = false
+    private lateinit var binding: ActivityStudyScheduleBinding
+    private lateinit var model: StudyScheduleViewModel
+    private var studentId = 0L
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (!granted) notifyUser(getString(R.string.notifications_disabled))
+    }
 
-    private lateinit var viewModel: StudyScheduleViewModel
-    private lateinit var adapter: StudyScheduleAdapter
-    
-    // Giả lập Student ID đăng nhập. Khi ghép code sẽ lấy từ SharedPreferences
-    private val CURRENT_STUDENT_ID = 1L
+    override fun prepareContent(savedInstanceState: Bundle?) {
+        binding = ActivityStudyScheduleBinding.inflate(layoutInflater)
+        installContent(binding.root)
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_study_schedule)
-
-        // 1. Khởi tạo ViewModel và Database
-        val database = AppDatabase.getDatabase(this)
-        val repository = StudyScheduleRepository(database.studyScheduleDao())
-        val factory = StudyScheduleViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory)[StudyScheduleViewModel::class.java]
-
-        // 2. Cài đặt RecyclerView và Adapter
-        adapter = StudyScheduleAdapter(
-            onCancelClick = { schedule -> 
-                viewModel.updateStatus(schedule, ScheduleStatus.CANCELLED)
-            },
-            onDeleteClick = { schedule ->
-                viewModel.deleteSchedule(schedule)
-            }
-        )
-        
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewSchedules)
-        recyclerView.adapter = adapter
-
-        // 3. Lắng nghe dữ liệu (Read/Search)
-        lifecycleScope.launch {
-            viewModel.getAllSchedules(CURRENT_STUDENT_ID).collect { schedules ->
-                adapter.submitList(schedules)
+    override fun onAuthorized(savedInstanceState: Bundle?) {
+        if (account.role != AccountRole.STUDENT) {
+            startActivity(Intent(this, AdminDashboardActivity::class.java)); finish(); return
+        }
+        setupToolbar(binding.toolbar, getString(R.string.study_schedules_title))
+        model = ViewModelProvider(this, StudyScheduleViewModelFactory(
+            StudyScheduleRepository(studyApp.database.studyScheduleDao(), account.id)
+        ))[StudyScheduleViewModel::class.java]
+        val adapter = StudyScheduleAdapter(::viewBooking, ::editBooking,
+            { confirmStatus(it, ScheduleStatus.CONFIRMED) }, { confirmStatus(it, ScheduleStatus.CANCELLED) }, ::confirmDelete)
+        binding.recyclerViewSchedules.layoutManager = LinearLayoutManager(this)
+        binding.recyclerViewSchedules.adapter = adapter
+        binding.searchInput.fill(model.keyword.value)
+        binding.searchInput.editText?.doAfterTextChanged { model.keyword.value = it?.toString().orEmpty() }
+        binding.statusChips.check(when (model.status.value) {
+            "PENDING" -> R.id.filterPending; "CONFIRMED" -> R.id.filterConfirmed
+            "CANCELLED" -> R.id.filterCancelled; else -> R.id.filterAll
+        })
+        binding.statusChips.setOnCheckedStateChangeListener { _, ids ->
+            model.status.value = when (ids.firstOrNull()) {
+                R.id.filterPending -> "PENDING"; R.id.filterConfirmed -> "CONFIRMED"
+                R.id.filterCancelled -> "CANCELLED"; else -> ""
             }
         }
-
-        // 4. Lắng nghe thông báo lỗi / thành công (Validation)
+        binding.addScheduleButton.isEnabled = false
+        runAction {
+            studentId = model.studentId() ?: error(getString(R.string.profile_missing))
+            binding.addScheduleButton.isEnabled = true
+        }
+        binding.addScheduleButton.setOnClickListener { editBooking(0) }
+        binding.bottomNavigation.setOnItemSelectedListener { showTab(it.itemId); true }
+        val initialTab = savedInstanceState?.getInt("tab") ?: intent.getIntExtra("tab", R.id.navigation_schedules)
+        binding.bottomNavigation.selectedItemId = initialTab
+        showTab(initialTab)
         lifecycleScope.launch {
-            viewModel.uiEvent.collect { message ->
-                Toast.makeText(this@StudyScheduleActivity, message, Toast.LENGTH_LONG).show()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                model.schedules.collect {
+                    adapter.submitList(it)
+                    binding.emptyState.isVisible = it.isEmpty()
+                    binding.resultCount.text = getString(R.string.results_count, it.size)
+                }
             }
         }
-
-        // 5. Nút Thêm lịch học
-        val fabAdd = findViewById<FloatingActionButton>(R.id.fabAddSchedule)
-        fabAdd.setOnClickListener {
-            showBookScheduleDialog()
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
+            savedInstanceState == null) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
-    private fun showBookScheduleDialog() {
-        val view = layoutInflater.inflate(R.layout.dialog_book_schedule, null)
-        val etSubjectId = view.findViewById<EditText>(R.id.etSubjectId)
-        val tvSelectDate = view.findViewById<TextView>(R.id.tvSelectDate)
-        val tvSelectStartTime = view.findViewById<TextView>(R.id.tvSelectStartTime)
-        val tvSelectEndTime = view.findViewById<TextView>(R.id.tvSelectEndTime)
-        val etLocation = view.findViewById<EditText>(R.id.etLocation)
+    private fun showTab(id: Int) {
+        val bookings = id == R.id.navigation_schedules
+        binding.bookingContent.isVisible = bookings
+        binding.fragmentContainer.isVisible = !bookings
+        binding.toolbar.setTitle(when (id) {
+            R.id.navigation_calendar -> R.string.title_calendar
+            R.id.navigation_notification -> R.string.title_notification
+            else -> R.string.study_schedules_title
+        })
+        val current = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (bookings) {
+            current?.let { supportFragmentManager.beginTransaction().remove(it).commit() }
+        } else if (current?.tag != id.toString()) {
+            val fragment = if (id == R.id.navigation_calendar) CalendarFragment() else NotificationFragment()
+            supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment, id.toString()).commit()
+        }
+    }
 
-        var selectedDate = ""
-        var selectedStartTime = ""
-        var selectedEndTime = ""
-
-        val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-        // Mở DatePicker
-        tvSelectDate.setOnClickListener {
-            DatePickerDialog(this, { _, year, month, dayOfMonth ->
-                calendar.set(year, month, dayOfMonth)
-                selectedDate = dateFormat.format(calendar.time)
-                tvSelectDate.text = selectedDate
+    private fun editBooking(id: Long) = runAction {
+        val subjects = model.subjects()
+        if (subjects.isEmpty()) { notifyUser(getString(R.string.no_subjects)); return@runAction }
+        val old = if (id == 0L) null else model.getById(id) ?: error(getString(R.string.not_found))
+        val form = DialogBookScheduleBinding.inflate(layoutInflater)
+        listOf(form.dateValue, form.startValue, form.endValue).forEach {
+            it.keyListener = null
+            it.isFocusable = true
+            it.showSoftInputOnFocus = false
+        }
+        var subjectId = old?.subjectId ?: subjects.first().id
+        val labels = subjects.map { "${it.subjectCode} · ${it.subjectName}" }
+        form.subjectDropdown.setAdapter(ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, labels))
+        form.subjectDropdown.setText(labels[subjects.indexOfFirst { it.id == subjectId }.coerceAtLeast(0)], false)
+        form.subjectDropdown.setOnItemClickListener { _, _, position, _ -> subjectId = subjects[position].id }
+        form.dateInput.fill(old?.studyDate.orEmpty())
+        form.startInput.fill(old?.startTime.orEmpty())
+        form.endInput.fill(old?.endTime.orEmpty())
+        form.locationInput.fill(old?.location.orEmpty())
+        form.dateValue.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            runCatching { SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(form.dateInput.value()) }.getOrNull()?.let { calendar.time = it }
+            DatePickerDialog(this, { _, year, month, day ->
+                form.dateInput.fill(String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day))
+                form.dateInput.error = null
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
-
-        // Mở TimePicker cho StartTime
-        tvSelectStartTime.setOnClickListener {
-            TimePickerDialog(this, { _, hourOfDay, minute ->
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                calendar.set(Calendar.MINUTE, minute)
-                selectedStartTime = timeFormat.format(calendar.time)
-                tvSelectStartTime.text = selectedStartTime
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+        fun pickTime(start: Boolean) {
+            val input = if (start) form.startInput else form.endInput
+            val parts = input.value().split(":").mapNotNull { it.toIntOrNull() }
+            TimePickerDialog(this, { _, hour, minute ->
+                input.fill(String.format(Locale.US, "%02d:%02d", hour, minute)); input.error = null
+            }, parts.getOrElse(0) { 8 }, parts.getOrElse(1) { 0 }, true).show()
         }
-
-        // Mở TimePicker cho EndTime
-        tvSelectEndTime.setOnClickListener {
-            TimePickerDialog(this, { _, hourOfDay, minute ->
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                calendar.set(Calendar.MINUTE, minute)
-                selectedEndTime = timeFormat.format(calendar.time)
-                tvSelectEndTime.text = selectedEndTime
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
-        }
-
-        MaterialAlertDialogBuilder(this)
-            .setView(view)
-            .setPositiveButton("Lưu") { dialog, _ ->
-                val subjectIdStr = etSubjectId.text.toString()
-                val location = etLocation.text.toString()
-
-                if (subjectIdStr.isEmpty() || selectedDate.isEmpty() || selectedStartTime.isEmpty() || selectedEndTime.isEmpty()) {
-                    Toast.makeText(this, "Vui lòng nhập đủ thông tin!", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+        form.startValue.setOnClickListener { pickTime(true) }
+        form.endValue.setOnClickListener { pickTime(false) }
+        val dialog = MaterialAlertDialogBuilder(this).setTitle(if (old == null) R.string.book_schedule else R.string.edit_schedule)
+            .setView(form.root).setNegativeButton(R.string.cancel, null).setPositiveButton(R.string.save, null).create()
+        dialog.setOnShowListener {
+            val button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val checks = listOf(form.dateInput, form.startInput, form.endInput, form.locationInput).map {
+                    it.validate(getString(R.string.required), it.value().isNotEmpty())
                 }
-
-                val subjectId = subjectIdStr.toLongOrNull() ?: 1L
-                
-                // Gọi ViewModel thực hiện Check Conflict và Create
-                viewModel.bookSchedule(
-                    studentId = CURRENT_STUDENT_ID,
-                    subjectId = subjectId,
-                    date = selectedDate,
-                    startTime = selectedStartTime,
-                    endTime = selectedEndTime,
-                    location = location
-                )
-                dialog.dismiss()
+                if (checks.all { it }) runAction(button) {
+                    val newId = model.save(StudySchedule(id, old?.studentId ?: studentId, subjectId,
+                        form.dateInput.value(), form.startInput.value(), form.endInput.value(), form.locationInput.value(),
+                        old?.status ?: ScheduleStatus.PENDING.name))
+                    ScheduleReminders.reschedule(this, newId)
+                    ScheduleReminders.notify(this, "change-$newId", getString(R.string.title_notification), getString(R.string.booking_saved))
+                    dialog.dismiss()
+                    notifyUser(getString(R.string.booking_saved))
+                }
             }
-            .setNegativeButton("Hủy", null)
-            .show()
+        }
+        dialog.show()
+    }
+
+    private fun viewBooking(id: Long) = runAction {
+        val row = model.schedules.value.firstOrNull { it.id == id } ?: return@runAction
+        val status = getString(when (row.status) {
+            "CONFIRMED" -> R.string.status_confirmed; "CANCELLED" -> R.string.status_cancelled; else -> R.string.status_pending
+        })
+        MaterialAlertDialogBuilder(this).setTitle(R.string.study_schedules_title)
+            .setMessage(getString(R.string.booking_detail, row.subjectCode, row.subjectName, row.studyDate,
+                row.startTime, row.endTime, row.location, status))
+            .setPositiveButton(R.string.edit) { _, _ -> editBooking(id) }.setNegativeButton(R.string.close, null).show()
+    }
+
+    private fun confirmStatus(id: Long, status: ScheduleStatus) {
+        MaterialAlertDialogBuilder(this).setTitle(if (status == ScheduleStatus.CANCELLED) R.string.cancel_booking else R.string.confirm_booking)
+            .setMessage(if (status == ScheduleStatus.CANCELLED) R.string.cancel_booking_question else R.string.confirm_booking_question)
+            .setNegativeButton(R.string.cancel, null).setPositiveButton(R.string.confirm_booking) { _, _ ->
+                runAction {
+                    model.changeStatus(id, status.name)
+                    ScheduleReminders.reschedule(this, id)
+                    ScheduleReminders.notify(this, "change-$id", getString(R.string.title_notification), getString(R.string.booking_status_changed))
+                    notifyUser(getString(R.string.booking_status_changed))
+                }
+            }.show()
+    }
+
+    private fun confirmDelete(id: Long) {
+        MaterialAlertDialogBuilder(this).setTitle(R.string.delete_booking).setMessage(R.string.delete_booking_question)
+            .setNegativeButton(R.string.cancel, null).setPositiveButton(R.string.delete) { _, _ ->
+                runAction {
+                    model.delete(id)
+                    ScheduleReminders.cancel(this, id)
+                    ScheduleReminders.notify(this, "change-$id", getString(R.string.title_notification), getString(R.string.deleted))
+                    notifyUser(getString(R.string.deleted))
+                }
+            }.show()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (::binding.isInitialized) outState.putInt("tab", binding.bottomNavigation.selectedItemId)
+        super.onSaveInstanceState(outState)
     }
 }

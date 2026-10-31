@@ -1,71 +1,49 @@
 package com.thuchanh2.th_mobile.ui.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.thuchanh2.th_mobile.R
-import com.thuchanh2.th_mobile.data.entity.StudySchedule
-import com.thuchanh2.th_mobile.data.entity.ScheduleStatus
+import com.thuchanh2.th_mobile.data.model.StudyScheduleWithSubject
+import com.thuchanh2.th_mobile.databinding.RowBookingBinding
 
 class StudyScheduleAdapter(
-    private val onCancelClick: (StudySchedule) -> Unit,
-    private val onDeleteClick: (StudySchedule) -> Unit
-) : ListAdapter<StudySchedule, StudyScheduleAdapter.ScheduleViewHolder>(ScheduleDiffCallback()) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_study_schedule, parent, false)
-        return ScheduleViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ScheduleViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
-
-    inner class ScheduleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-        private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
-        private val tvLocation: TextView = itemView.findViewById(R.id.tvLocation)
-        private val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
-        private val btnCancel: Button = itemView.findViewById(R.id.btnCancel)
-        private val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
-
-        fun bind(schedule: StudySchedule) {
-            tvDate.text = schedule.studyDate
-            tvTime.text = "${schedule.startTime} - ${schedule.endTime}"
-            tvLocation.text = schedule.location
-            tvStatus.text = schedule.status
-
-            when (schedule.status) {
-                ScheduleStatus.PENDING.name -> tvStatus.setTextColor(Color.parseColor("#FF9800")) // Orange
-                ScheduleStatus.CONFIRMED.name -> tvStatus.setTextColor(Color.parseColor("#4CAF50")) // Green
-                ScheduleStatus.CANCELLED.name -> tvStatus.setTextColor(Color.parseColor("#F44336")) // Red
-            }
-
-            btnCancel.visibility = if (schedule.status == ScheduleStatus.CANCELLED.name) View.GONE else View.VISIBLE
-            
-            btnCancel.setOnClickListener {
-                onCancelClick(schedule)
-            }
-            
-            btnDelete.setOnClickListener {
-                onDeleteClick(schedule)
-            }
-        }
-    }
-
-    class ScheduleDiffCallback : DiffUtil.ItemCallback<StudySchedule>() {
-        override fun areItemsTheSame(oldItem: StudySchedule, newItem: StudySchedule): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: StudySchedule, newItem: StudySchedule): Boolean {
-            return oldItem == newItem
+    private val onView: (Long) -> Unit,
+    private val onEdit: (Long) -> Unit,
+    private val onConfirm: (Long) -> Unit,
+    private val onCancel: (Long) -> Unit,
+    private val onDelete: (Long) -> Unit
+) : ListAdapter<StudyScheduleWithSubject, StudyScheduleAdapter.Holder>(object : DiffUtil.ItemCallback<StudyScheduleWithSubject>() {
+    override fun areItemsTheSame(oldItem: StudyScheduleWithSubject, newItem: StudyScheduleWithSubject) = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: StudyScheduleWithSubject, newItem: StudyScheduleWithSubject) = oldItem == newItem
+}) {
+    class Holder(val binding: RowBookingBinding) : RecyclerView.ViewHolder(binding.root)
+    override fun onCreateViewHolder(parent: ViewGroup, type: Int) =
+        Holder(RowBookingBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        val row = getItem(position)
+        val context = holder.itemView.context
+        holder.binding.apply {
+            subjectName.text = row.subjectName
+            subjectCode.text = row.subjectCode
+            date.text = context.getString(R.string.schedule_date_label, row.studyDate)
+            time.text = context.getString(R.string.time_range, row.startTime, row.endTime)
+            location.text = row.location
+            status.setText(when (row.status) {
+                "CONFIRMED" -> R.string.status_confirmed
+                "CANCELLED" -> R.string.status_cancelled
+                else -> R.string.status_pending
+            })
+            confirmButton.isVisible = row.status != "CONFIRMED"
+            cancelButton.isVisible = row.status != "CANCELLED"
+            root.setOnClickListener { onView(row.id) }
+            editButton.setOnClickListener { onEdit(row.id) }
+            confirmButton.setOnClickListener { onConfirm(row.id) }
+            cancelButton.setOnClickListener { onCancel(row.id) }
+            deleteButton.setOnClickListener { onDelete(row.id) }
         }
     }
 }

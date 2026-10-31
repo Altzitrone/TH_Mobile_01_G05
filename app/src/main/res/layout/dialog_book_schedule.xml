@@ -1,69 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Đặt lịch học mới"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Tạm dùng ID môn học. Sau này ráp chung với team sẽ dùng Spinner -->
-    <EditText
-        android:id="@+id/etSubjectId"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập ID Môn học (VD: 1)"
-        android:inputType="number"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/tvSelectDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Chọn ngày (YYYY-MM-DD)"
-        android:padding="12dp"
-        android:background="?attr/selectableItemBackground"
-        android:textColor="@android:color/holo_blue_dark"
-        android:layout_marginBottom="8dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvSelectStartTime"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Giờ bắt đầu"
-            android:padding="12dp"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/holo_blue_dark" />
-
-        <TextView
-            android:id="@+id/tvSelectEndTime"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Giờ kết thúc"
-            android:padding="12dp"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/holo_blue_dark" />
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout style="@style/PageContent">
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/subjectInput"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+            android:hint="@string/select_subject">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/subjectDropdown"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/dateInput" style="@style/InputField" android:hint="@string/study_date">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/dateValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/startInput" style="@style/InputField" android:hint="@string/start_time">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/startValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/endInput" style="@style/InputField" android:hint="@string/end_time">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/endValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/locationInput" style="@style/InputField" android:hint="@string/study_location">
+            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="textCapSentences" android:maxLength="200" />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/etLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Địa điểm (VD: Phòng 301)"
-        android:layout_marginTop="8dp"
-        android:inputType="text"/>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

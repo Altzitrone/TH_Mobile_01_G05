@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Quản lý Lịch học</string>
     <string name="title_calendar">Lịch học tập</string>
     <string name="title_notification">Thông báo</string>
     <string name="title_dashboard">Trang chủ</string>
@@ -12,7 +11,7 @@
     <string name="filter_upcoming">Sắp diễn ra</string>
     <string name="filter_changes">Thay đổi lịch</string>
 
-    <string name="status_pending">Đợi duyệt</string>
+    <string name="status_pending">Chờ xác nhận</string>
     <string name="status_confirmed">Đã xác nhận</string>
     <string name="status_cancelled">Đã hủy</string>
 
@@ -21,7 +20,7 @@
     <string name="no_schedule_desc">Bạn không có buổi học nào vào ngày được chọn.</string>
     <string name="no_notification_title">Chưa có thông báo mới</string>
     <string name="no_notification_desc">Thông báo về lịch học sẽ được hiển thị ở đây.</string>
-</resources>
+
     <string name="app_name">StudyHub</string>
     <string name="brand">STUDYHUB</string>
     <string name="brand_mark">S</string>
@@ -113,4 +112,34 @@
     <string name="profile_loading">Đang tải dữ liệu…</string>
     <string name="student_list_title">Sinh viên</string>
     <string name="subject_list_title">Môn học</string>
+    <string name="study_schedules_title">Lịch học của tôi</string>
+    <string name="book_schedule">Đặt lịch học</string>
+    <string name="edit_schedule">Sửa lịch học</string>
+    <string name="search_schedules">Tìm môn học, ngày, địa điểm hoặc trạng thái</string>
+    <string name="select_subject">Chọn môn học</string>
+    <string name="no_subjects">Chưa có môn học. Vui lòng liên hệ Admin để thêm môn học trước khi đặt lịch.</string>
+    <string name="study_date">Ngày học</string>
+    <string name="start_time">Giờ bắt đầu</string>
+    <string name="end_time">Giờ kết thúc</string>
+    <string name="study_location">Địa điểm học</string>
+    <string name="confirm_booking">Xác nhận</string>
+    <string name="cancel_booking">Hủy lịch</string>
+    <string name="delete_booking">Xóa lịch</string>
+    <string name="delete_booking_question">Xóa buổi học này? Thao tác này không thể hoàn tác.</string>
+    <string name="cancel_booking_question">Bạn muốn hủy buổi học này?</string>
+    <string name="booking_saved">Đã lưu lịch học.</string>
+    <string name="booking_status_changed">Đã cập nhật trạng thái lịch học.</string>
+    <string name="booking_detail">%1$s · %2$s\n%3$s\n%4$s – %5$s\nĐịa điểm: %6$s\nTrạng thái: %7$s</string>
+    <string name="calendar_day_header">Lịch học ngày %1$s</string>
+    <string name="calendar_week_header">Lịch học tuần %1$s – %2$s</string>
+    <string name="calendar_month_header">Lịch học tháng %1$d/%2$d</string>
+    <string name="time_range">%1$s – %2$s</string>
+    <string name="schedule_date_label">Ngày %1$s</string>
+    <string name="notification_channel">Nhắc lịch học</string>
+    <string name="notification_channel_description">Nhắc trước buổi học và thông báo thay đổi lịch.</string>
+    <string name="upcoming_title">Buổi học sắp diễn ra</string>
+    <string name="upcoming_message">%1$s bắt đầu lúc %2$s tại %3$s.</string>
+    <string name="notifications_disabled">Thông báo hệ thống đang tắt. Bạn vẫn có thể xem thông báo trong ứng dụng.</string>
+    <string name="schedule_hint">Đặt lịch, quản lý buổi học và xem calendar của bạn.</string>
+    <string name="confirm_booking_question">Xác nhận buổi học này? Ứng dụng sẽ kiểm tra lại trùng lịch.</string>
 </resources>

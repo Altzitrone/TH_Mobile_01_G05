@@ -26,6 +26,8 @@ class SessionManager(context: Context, private val accountDao: AccountDao) {
         activeAccountId = account.id
         preferences.edit {
             clear()
+            // Reminder identity survives process death without restoring an unchecked login session.
+            putLong("notificationAccountId", account.id)
             if (remember) {
                 putLong("accountId", account.id)
                 putString("username", account.username)
@@ -39,4 +41,6 @@ class SessionManager(context: Context, private val accountDao: AccountDao) {
         activeAccountId = null
         preferences.edit { clear() }
     }
+
+    fun reminderAccountId(): Long = activeAccountId ?: preferences.getLong("notificationAccountId", 0)
 }

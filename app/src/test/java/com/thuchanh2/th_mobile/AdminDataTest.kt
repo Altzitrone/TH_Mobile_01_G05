@@ -151,6 +151,7 @@ class AdminDataTest {
         temporary.login(student, false)
         assertEquals(student.id, temporary.currentAccount()?.id)
         assertNull(SessionManager(context, db.accountDao()).currentAccount())
+        assertEquals(student.id, SessionManager(context, db.accountDao()).reminderAccountId())
         temporary.login(student, true)
         db.studentDao().delete(admin.id, studentId)
         assertNull(SessionManager(context, db.accountDao()).currentAccount())

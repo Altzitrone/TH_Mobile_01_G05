@@ -2,29 +2,15 @@ package com.thuchanh2.th_mobile.repository
 
 import com.thuchanh2.th_mobile.data.dao.StudyScheduleDao
 import com.thuchanh2.th_mobile.data.entity.StudySchedule
-import kotlinx.coroutines.flow.Flow
 
-class StudyScheduleRepository(private val dao: StudyScheduleDao) {
-
-    suspend fun insert(schedule: StudySchedule) = dao.insert(schedule)
-
-    suspend fun update(schedule: StudySchedule) = dao.update(schedule)
-
-    suspend fun delete(schedule: StudySchedule) = dao.delete(schedule)
-    
-    suspend fun getById(id: Long) = dao.getById(id)
-
-    fun getAllByStudentId(studentId: Long): Flow<List<StudySchedule>> = dao.getAllByStudentId(studentId)
-
-    fun search(studentId: Long, query: String): Flow<List<StudySchedule>> = dao.search(studentId, query)
-
-    suspend fun checkConflict(studentId: Long, date: String, startTime: String, endTime: String): Boolean {
-        val conflicts = dao.checkConflict(studentId, date, startTime, endTime)
-        return conflicts.isNotEmpty()
-    }
-    
-    suspend fun checkConflictForUpdate(scheduleId: Long, studentId: Long, date: String, startTime: String, endTime: String): Boolean {
-        val conflicts = dao.checkConflictForUpdate(scheduleId, studentId, date, startTime, endTime)
-        return conflicts.isNotEmpty()
-    }
+/** Identity is the authenticated Account ID, not a fixed Student ID. */
+class StudyScheduleRepository(private val dao: StudyScheduleDao, private val accountId: Long) {
+    fun search(query: String, status: String) = dao.search(accountId, query, status)
+    suspend fun subjects() = dao.availableSubjects(accountId)
+    suspend fun currentStudentId() = dao.studentIdForAccount(accountId)
+    suspend fun getById(id: Long) = dao.getById(accountId, id)
+    suspend fun save(schedule: StudySchedule): Long = if (schedule.id == 0L) dao.create(accountId, schedule)
+        else { dao.update(accountId, schedule); schedule.id }
+    suspend fun delete(id: Long) = dao.delete(accountId, id)
+    suspend fun changeStatus(id: Long, status: String) = dao.changeStatus(accountId, id, status)
 }

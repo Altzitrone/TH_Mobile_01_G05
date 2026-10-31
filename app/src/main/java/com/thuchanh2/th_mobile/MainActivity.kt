@@ -3,9 +3,7 @@ package com.thuchanh2.th_mobile
 import android.os.Bundle
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.*
-import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -48,30 +46,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
-
-        if (savedInstanceState == null) {
-            replaceFragment(CalendarFragment())
-        }
-
-        bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_calendar -> {
-                    replaceFragment(CalendarFragment())
-                    true
-                }
-                R.id.navigation_notification -> {
-                    replaceFragment(NotificationFragment())
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
-    }
 }

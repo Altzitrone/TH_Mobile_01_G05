@@ -10,7 +10,7 @@ enum class ScheduleStatus {
 }
 
 @Entity(
-    tableName = "study_schedules",
+    tableName = "StudySchedule",
     foreignKeys = [
         ForeignKey(
             entity = Student::class,
@@ -22,7 +22,7 @@ enum class ScheduleStatus {
             entity = Subject::class,
             parentColumns = ["id"],
             childColumns = ["subjectId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.RESTRICT
         )
     ],
     indices = [Index("studentId"), Index("subjectId")]

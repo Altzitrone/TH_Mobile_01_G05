@@ -17,7 +17,9 @@ class LayoutInflationTest {
         val inflater = LayoutInflater.from(context)
         listOf(R.layout.activity_main, R.layout.activity_admin_dashboard, R.layout.activity_records,
             R.layout.activity_student_editor, R.layout.activity_subject_editor, R.layout.activity_student_home,
-            R.layout.row_record, R.layout.dialog_change_password).forEach {
+            R.layout.row_record, R.layout.dialog_change_password, R.layout.activity_study_schedule,
+            R.layout.dialog_book_schedule, R.layout.row_booking, R.layout.fragment_calendar,
+            R.layout.fragment_notification, R.layout.item_study_schedule, R.layout.item_notification).forEach {
             assertNotNull(inflater.inflate(it, null, false))
         }
     }

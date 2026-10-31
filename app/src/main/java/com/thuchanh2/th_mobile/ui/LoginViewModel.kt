@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.thuchanh2.th_mobile.StudyApplication
+import com.thuchanh2.th_mobile.notifications.ScheduleReminders
+import android.util.Log
 import com.thuchanh2.th_mobile.data.entity.Account
 import com.thuchanh2.th_mobile.data.entity.AccountRole
 import kotlinx.coroutines.CancellationException
@@ -22,9 +24,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 app.database.accountDao().ensureDefaultAdmin()
+                try { ScheduleReminders.restore(app) }
+                catch (error: CancellationException) { throw error }
+                catch (error: Exception) { Log.w("Login", "Cannot restore reminders", error) }
                 mutableState.value = LoginState(busy = false, account = app.session.currentAccount())
             } catch (error: CancellationException) { throw error }
-            catch (_: Exception) { mutableState.value = LoginState(busy = false, error = "Không thể mở dữ liệu. Vui lòng mở lại ứng dụng.") }
+            catch (error: Exception) {
+                Log.e("Login", "Cannot initialize local database", error)
+                mutableState.value = LoginState(busy = false, error = "Không thể mở dữ liệu. Vui lòng mở lại ứng dụng.")
+            }
         }
     }
 
@@ -41,7 +49,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     mutableState.value = LoginState(busy = false, account = account)
                 }
             } catch (error: CancellationException) { throw error }
-            catch (_: Exception) { mutableState.value = LoginState(busy = false, error = "Không thể đăng nhập. Vui lòng thử lại.") }
+            catch (error: Exception) {
+                Log.e("Login", "Local authentication failed", error)
+                mutableState.value = LoginState(busy = false, error = "Không thể đăng nhập. Vui lòng thử lại.")
+            }
         }
     }
 }

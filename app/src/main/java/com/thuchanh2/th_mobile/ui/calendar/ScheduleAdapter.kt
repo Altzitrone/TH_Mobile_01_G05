@@ -31,10 +31,12 @@ class ScheduleAdapter(
         private val tvTime: TextView = itemView.findViewById(R.id.tvTime)
         private val tvLocation: TextView = itemView.findViewById(R.id.tvLocation)
         private val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
+        private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
 
         fun bind(item: StudyScheduleWithSubject) {
             tvSubjectCode.text = item.subjectCode
             tvSubjectName.text = item.subjectName
+            tvDate.text = itemView.context.getString(R.string.schedule_date_label, item.studyDate)
             tvTime.text = "⏰ ${item.startTime} - ${item.endTime}"
             tvLocation.text = "📍 ${item.location}"
 

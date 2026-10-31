@@ -45,6 +45,12 @@ class CalendarFragment : Fragment() {
 
         initViews(view)
         setupRecyclerView()
+        calendarView.date = viewModel.selectedCalendar.timeInMillis
+        chipGroupViewMode.check(when (viewModel.viewMode.value) {
+            CalendarViewMode.WEEKLY -> R.id.chipWeekly
+            CalendarViewMode.MONTHLY -> R.id.chipMonthly
+            else -> R.id.chipDaily
+        })
         setupListeners()
         observeViewModel()
     }

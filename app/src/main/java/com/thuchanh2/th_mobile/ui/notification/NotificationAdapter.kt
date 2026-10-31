@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.thuchanh2.th_mobile.R
-import com.thuchanh2.th_mobile.data.model.NotificationItem
+import com.thuchanh2.th_mobile.data.entity.NotificationItem
 
 class NotificationAdapter(
     private val onItemClick: ((NotificationItem) -> Unit)? = null

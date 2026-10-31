@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -33,6 +34,8 @@ fun AppCompatActivity.installContent(root: View) {
         view.setPadding(left + bars.left, top + bars.top, right + bars.right, bottom + bars.bottom)
         insets
     }
+    // Protected screens can attach after the initial window-inset dispatch.
+    root.doOnAttach { ViewCompat.requestApplyInsets(it) }
 }
 
 fun AppCompatActivity.setupToolbar(toolbar: MaterialToolbar, title: String, back: Boolean = true) {
@@ -80,6 +83,7 @@ abstract class ProtectedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        prepareContent(savedInstanceState)
         lifecycleScope.launch {
             try {
                 val current = studyApp.session.currentAccount()
@@ -97,6 +101,7 @@ abstract class ProtectedActivity : AppCompatActivity() {
     }
 
     protected abstract fun onAuthorized(savedInstanceState: Bundle?)
+    protected open fun prepareContent(savedInstanceState: Bundle?) = Unit
 
     protected fun confirmLogout() {
         MaterialAlertDialogBuilder(this).setTitle(R.string.logout).setMessage(R.string.logout_confirm)
