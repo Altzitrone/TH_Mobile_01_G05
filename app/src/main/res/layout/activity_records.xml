@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+  <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:paddingHorizontal="20dp">
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/searchInput" style="@style/InputField" android:hint="@string/search_students" app:endIconMode="clear_text">
+      <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="text" android:maxLength="200" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView android:id="@+id/resultCount" style="@style/PageBody" android:text="@string/profile_loading" android:layout_marginBottom="8dp" android:accessibilityLiveRegion="polite" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+      <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerView" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="12dp" />
+      <LinearLayout android:id="@+id/emptyState" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:visibility="gone">
+        <TextView style="@style/SectionLabel" android:text="@string/no_results" android:gravity="center" />
+        <TextView style="@style/PageBody" android:text="@string/no_results_hint" android:gravity="center" />
+      </LinearLayout>
+    </FrameLayout>
+    <com.google.android.material.button.MaterialButton android:id="@+id/addButton" style="@style/PrimaryButton" android:text="@string/add_student" />
+  </LinearLayout>
+</LinearLayout>

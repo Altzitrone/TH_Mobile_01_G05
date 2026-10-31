@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+  <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+    <LinearLayout style="@style/PageContent">
+      <TextView style="@style/PageBody" android:text="@string/welcome_student" />
+      <TextView android:id="@+id/studentName" style="@style/PageHeading" android:text="@string/student_home" />
+      <TextView style="@style/PageBody" android:text="@string/student_home_hint" android:layout_marginTop="8dp" />
+      <com.google.android.material.button.MaterialButton android:id="@+id/schedulesButton" style="@style/PrimaryButton" android:text="@string/book_schedule" />
+      <com.google.android.material.button.MaterialButton android:id="@+id/calendarButton" style="@style/SecondaryButton" android:text="@string/title_calendar" />
+      <com.google.android.material.button.MaterialButton android:id="@+id/notificationsButton" style="@style/SecondaryButton" android:text="@string/title_notification" />
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/student_section" />
+          <TextView android:id="@+id/profileInfo" style="@style/PageBody" android:text="@string/profile_loading" android:lineSpacingExtra="8dp" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/account_section" />
+          <TextView android:id="@+id/accountInfo" style="@style/PageBody" android:text="@string/profile_loading" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/changePasswordButton" style="@style/PrimaryButton" android:text="@string/change_password" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/logoutButton" style="@style/PrimaryButton" android:text="@string/logout" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</LinearLayout>

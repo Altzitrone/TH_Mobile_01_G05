@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout style="@style/PageContent">
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/subjectInput"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+            android:hint="@string/select_subject">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/subjectDropdown"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/dateInput" style="@style/InputField" android:hint="@string/study_date">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/dateValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/startInput" style="@style/InputField" android:hint="@string/start_time">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/startValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/endInput" style="@style/InputField" android:hint="@string/end_time">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/endValue" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:focusable="true" android:clickable="true" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/locationInput" style="@style/InputField" android:hint="@string/study_location">
+            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="textCapSentences" android:maxLength="200" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

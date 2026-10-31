@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/PageRoot" android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:id="@+id/bookingContent" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:orientation="vertical" android:paddingHorizontal="16dp">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/searchInput"
+                style="@style/InputField" android:hint="@string/search_schedules" app:endIconMode="clear_text">
+                <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:inputType="text" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.chip.ChipGroup android:id="@+id/statusChips" android:layout_width="match_parent"
+                android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true">
+                <com.google.android.material.chip.Chip android:id="@+id/filterAll" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/filter_all" />
+                <com.google.android.material.chip.Chip android:id="@+id/filterPending" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/status_pending" />
+                <com.google.android.material.chip.Chip android:id="@+id/filterConfirmed" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/status_confirmed" />
+                <com.google.android.material.chip.Chip android:id="@+id/filterCancelled" style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/status_cancelled" />
+            </com.google.android.material.chip.ChipGroup>
+            <TextView android:id="@+id/resultCount" style="@style/PageBody" android:accessibilityLiveRegion="polite" />
+            <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerViewSchedules" android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:clipToPadding="false" android:paddingVertical="8dp" />
+                <TextView android:id="@+id/emptyState" android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:gravity="center" android:text="@string/no_schedule_title" android:visibility="gone" />
+            </FrameLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/addScheduleButton" style="@style/PrimaryButton"
+                android:text="@string/book_schedule" />
+        </LinearLayout>
+        <androidx.fragment.app.FragmentContainerView android:id="@+id/fragmentContainer" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:visibility="gone" />
+    </FrameLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:menu="@menu/bottom_nav_menu" />
+</LinearLayout>

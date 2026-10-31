@@ -1,7 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.TH_Mobile_G5" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">#BBC3FF</item>
+        <item name="colorOnPrimary">#17266E</item>
+        <item name="colorPrimaryContainer">#303F91</item>
+        <item name="colorOnPrimaryContainer">#E1E5FF</item>
+        <item name="colorSurface">#12131C</item>
+        <item name="colorSurfaceContainer">#20212B</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>
