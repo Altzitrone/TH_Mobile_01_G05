@@ -1,4 +1,27 @@
 <resources>
+    <string name="app_name">Quản lý Lịch học</string>
+    <string name="title_calendar">Lịch học tập</string>
+    <string name="title_notification">Thông báo</string>
+    <string name="title_dashboard">Trang chủ</string>
+
+    <string name="view_daily">Theo ngày</string>
+    <string name="view_weekly">Theo tuần</string>
+    <string name="view_monthly">Theo tháng</string>
+
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_upcoming">Sắp diễn ra</string>
+    <string name="filter_changes">Thay đổi lịch</string>
+
+    <string name="status_pending">Đợi duyệt</string>
+    <string name="status_confirmed">Đã xác nhận</string>
+    <string name="status_cancelled">Đã hủy</string>
+
+    <string name="mark_all_read">Đánh dấu đã đọc tất cả</string>
+    <string name="no_schedule_title">Không có lịch học</string>
+    <string name="no_schedule_desc">Bạn không có buổi học nào vào ngày được chọn.</string>
+    <string name="no_notification_title">Chưa có thông báo mới</string>
+    <string name="no_notification_desc">Thông báo về lịch học sẽ được hiển thị ở đây.</string>
+</resources>
     <string name="app_name">StudyHub</string>
     <string name="brand">STUDYHUB</string>
     <string name="brand_mark">S</string>
