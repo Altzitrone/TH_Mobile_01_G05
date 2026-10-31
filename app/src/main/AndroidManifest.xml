@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".StudyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,6 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TH_Mobile_G5">
+        <activity android:name=".ui.AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".ui.StudentHomeActivity" android:exported="false" />
+        <activity android:name=".ui.StudentListActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.SubjectListActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.StudentEditorActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.SubjectEditorActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

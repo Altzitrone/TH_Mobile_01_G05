@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/card_bg"
-        app:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout style="@style/PageContent" android:gravity="center_vertical" android:paddingTop="40dp" android:paddingBottom="40dp">
+      <TextView android:layout_width="64dp" android:layout_height="64dp" android:text="@string/brand_mark" android:gravity="center" android:textSize="32sp" android:textStyle="bold" android:textColor="?attr/colorOnPrimary" android:background="@drawable/bg_brand" />
+      <TextView style="@style/SectionLabel" android:text="@string/brand" android:textColor="?attr/colorPrimary" android:letterSpacing="0.16" />
+      <TextView style="@style/PageHeading" android:text="@string/login_title" />
+      <TextView style="@style/PageBody" android:text="@string/login_subtitle" android:layout_marginTop="12dp" android:layout_marginBottom="28dp" />
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/usernameInput" style="@style/InputField" android:hint="@string/username" app:counterEnabled="true" app:counterMaxLength="32">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textVisiblePassword" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/passwordInput" style="@style/InputField" android:hint="@string/password" app:endIconMode="password_toggle">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textPassword" android:maxLength="200" android:saveEnabled="false" android:importantForAutofill="no" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.checkbox.MaterialCheckBox android:id="@+id/rememberLogin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/remember_login" />
+      <TextView android:id="@+id/loginError" style="@style/PageBody" android:text="@string/error_generic" android:textColor="?attr/colorError" android:visibility="gone" android:accessibilityLiveRegion="polite" android:layout_marginBottom="12dp" />
+      <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/progress" android:layout_width="match_parent" android:layout_height="wrap_content" android:indeterminate="true" android:layout_marginBottom="12dp" />
+      <com.google.android.material.button.MaterialButton android:id="@+id/loginButton" style="@style/PrimaryButton" android:text="@string/login" />
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/first_login" />
+          <TextView style="@style/PageBody" android:text="@string/default_admin_hint" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</LinearLayout>
