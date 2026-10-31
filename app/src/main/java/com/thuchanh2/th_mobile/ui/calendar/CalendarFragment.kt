@@ -9,21 +9,17 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
 import com.thuchanh2.th_mobile.R
-import com.thuchanh2.th_mobile.data.db.AppDatabase
 import com.thuchanh2.th_mobile.data.model.StudyScheduleWithSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class CalendarFragment : Fragment() {
 
@@ -33,13 +29,8 @@ class CalendarFragment : Fragment() {
     private lateinit var rvSchedule: RecyclerView
     private lateinit var layoutEmptyState: LinearLayout
 
+    private val viewModel: CalendarViewModel by viewModels()
     private val scheduleAdapter = ScheduleAdapter()
-    private val selectedCalendar: Calendar = Calendar.getInstance()
-    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val displayDateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-    private var currentStudentId: Long = 1L // Default student ID
-    private var loadJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,8 +46,7 @@ class CalendarFragment : Fragment() {
         initViews(view)
         setupRecyclerView()
         setupListeners()
-        seedSampleDataIfEmpty()
-        loadScheduleForSelectedMode()
+        observeViewModel()
     }
 
     private fun initViews(view: View) {
@@ -74,54 +64,28 @@ class CalendarFragment : Fragment() {
 
     private fun setupListeners() {
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            selectedCalendar.set(Calendar.YEAR, year)
-            selectedCalendar.set(Calendar.MONTH, month)
-            selectedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            loadScheduleForSelectedMode()
+            viewModel.setDate(year, month, dayOfMonth)
         }
 
-        chipGroupViewMode.setOnCheckedStateChangeListener { _, _ ->
-            loadScheduleForSelectedMode()
+        chipGroupViewMode.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.isNotEmpty()) {
+                viewModel.setViewModeByChipId(checkedIds.first())
+            }
         }
     }
 
-    private fun loadScheduleForSelectedMode() {
-        val db = AppDatabase.getInstance(requireContext())
-        val selectedDateStr = dateFormatter.format(selectedCalendar.time)
-        val formattedDisplayDate = displayDateFormatter.format(selectedCalendar.time)
-
-        val checkedChipId = chipGroupViewMode.checkedChipId
-
-        loadJob?.cancel()
-        loadJob = lifecycleScope.launch {
-            when (checkedChipId) {
-                R.id.chipDaily -> {
-                    tvSelectedDateHeader.text = "Danh sách lịch học ngày $formattedDisplayDate"
-                    db.studyScheduleDao().getSchedulesByDate(currentStudentId, selectedDateStr)
-                        .collectLatest { list -> updateUiList(list) }
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.headerTitle.collectLatest { title ->
+                        tvSelectedDateHeader.text = title
+                    }
                 }
-                R.id.chipWeekly -> {
-                    val (startDate, endDate) = getWeekRange(selectedCalendar)
-                    tvSelectedDateHeader.text = "Lịch học tuần (${displayDateFormatter.format(startDate.time)} - ${displayDateFormatter.format(endDate.time)})"
-                    db.studyScheduleDao().getSchedulesByDateRange(
-                        currentStudentId,
-                        dateFormatter.format(startDate.time),
-                        dateFormatter.format(endDate.time)
-                    ).collectLatest { list -> updateUiList(list) }
-                }
-                R.id.chipMonthly -> {
-                    val (startDate, endDate) = getMonthRange(selectedCalendar)
-                    tvSelectedDateHeader.text = "Lịch học tháng ${selectedCalendar.get(Calendar.MONTH) + 1}/${selectedCalendar.get(Calendar.YEAR)}"
-                    db.studyScheduleDao().getSchedulesByDateRange(
-                        currentStudentId,
-                        dateFormatter.format(startDate.time),
-                        dateFormatter.format(endDate.time)
-                    ).collectLatest { list -> updateUiList(list) }
-                }
-                else -> {
-                    tvSelectedDateHeader.text = "Danh sách lịch học ngày $formattedDisplayDate"
-                    db.studyScheduleDao().getSchedulesByDate(currentStudentId, selectedDateStr)
-                        .collectLatest { list -> updateUiList(list) }
+                launch {
+                    viewModel.schedules.collectLatest { list ->
+                        updateUiList(list)
+                    }
                 }
             }
         }
@@ -132,42 +96,5 @@ class CalendarFragment : Fragment() {
         val isEmpty = list.isEmpty()
         rvSchedule.isVisible = !isEmpty
         layoutEmptyState.isVisible = isEmpty
-    }
-
-    private fun getWeekRange(cal: Calendar): Pair<Calendar, Calendar> {
-        val start = cal.clone() as Calendar
-        start.set(Calendar.DAY_OF_WEEK, start.firstDayOfWeek)
-        val end = start.clone() as Calendar
-        end.add(Calendar.DAY_OF_WEEK, 6)
-        return Pair(start, end)
-    }
-
-    private fun getMonthRange(cal: Calendar): Pair<Calendar, Calendar> {
-        val start = cal.clone() as Calendar
-        start.set(Calendar.DAY_OF_MONTH, 1)
-        val end = cal.clone() as Calendar
-        end.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-        return Pair(start, end)
-    }
-
-    private fun seedSampleDataIfEmpty() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val db = AppDatabase.getInstance(requireContext())
-            val todayStr = dateFormatter.format(Calendar.getInstance().time)
-
-            withContext(Dispatchers.IO) {
-                try {
-                    val conn = db.openHelper.writableDatabase
-                    conn.execSQL("INSERT OR IGNORE INTO accounts (id, username, password, role) VALUES (1, 'student', '123', 'STUDENT')")
-                    conn.execSQL("INSERT OR IGNORE INTO students (id, studentCode, fullname, email, phone, accountId) VALUES (1, 'SV001', 'Nguyễn Văn A', 'a@student.edu.vn', '0912345678', 1)")
-                    conn.execSQL("INSERT OR IGNORE INTO subjects (id, subjectCode, subjectName, description, credits) VALUES (1, 'MOB204', 'Lập trình Android', 'Android UI & Room', 3)")
-                    conn.execSQL("INSERT OR IGNORE INTO subjects (id, subjectCode, subjectName, description, credits) VALUES (2, 'WEB205', 'Lập trình Web', 'ReactJS & REST API', 3)")
-                    conn.execSQL("INSERT OR IGNORE INTO study_schedules (id, studentId, subjectId, studyDate, startTime, endTime, location, status) VALUES (1, 1, 1, '$todayStr', '08:00', '10:30', 'Phòng A302', 'Confirmed')")
-                    conn.execSQL("INSERT OR IGNORE INTO study_schedules (id, studentId, subjectId, studyDate, startTime, endTime, location, status) VALUES (2, 1, 2, '$todayStr', '13:30', '16:00', 'Phòng B105', 'Pending')")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
     }
 }
