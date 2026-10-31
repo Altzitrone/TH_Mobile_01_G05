@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+  <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+    <LinearLayout style="@style/PageContent">
+      <TextView style="@style/PageHeading" android:text="@string/dashboard_title" />
+      <TextView android:id="@+id/welcome" style="@style/PageBody" android:text="@string/dashboard_subtitle" android:layout_marginTop="8dp" />
+      <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="24dp">
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="8dp" android:layout_marginStart="0dp" app:cardBackgroundColor="?attr/colorPrimaryContainer" app:strokeWidth="0dp" app:cardCornerRadius="20dp">
+          <LinearLayout style="@style/PageContent">
+            <TextView android:id="@+id/studentCount" style="@style/PageHeading" android:text="@string/count_placeholder" />
+            <TextView style="@style/PageBody" android:text="@string/student_count" />
+          </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="0dp" android:layout_marginStart="8dp" app:cardBackgroundColor="?attr/colorPrimaryContainer" app:strokeWidth="0dp" app:cardCornerRadius="20dp">
+          <LinearLayout style="@style/PageContent">
+            <TextView android:id="@+id/subjectCount" style="@style/PageHeading" android:text="@string/count_placeholder" />
+            <TextView style="@style/PageBody" android:text="@string/subject_count" />
+          </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+      </LinearLayout>
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/manage_students" />
+          <TextView style="@style/PageBody" android:text="@string/manage_students_hint" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/studentsButton" style="@style/PrimaryButton" android:text="@string/manage_students" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/manage_subjects" />
+          <TextView style="@style/PageBody" android:text="@string/manage_subjects_hint" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/subjectsButton" style="@style/PrimaryButton" android:text="@string/manage_subjects" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" app:cardCornerRadius="20dp" app:strokeWidth="0dp" app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout style="@style/PageContent">
+          <TextView style="@style/SectionLabel" android:text="@string/account_security" />
+          <TextView android:id="@+id/accountInfo" style="@style/PageBody" android:text="@string/admin_identity" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/changePasswordButton" style="@style/SecondaryButton" android:text="@string/change_password" />
+          <com.google.android.material.button.MaterialButton android:id="@+id/logoutButton" style="@style/TertiaryButton" android:text="@string/logout" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <TextView style="@style/PageBody" android:text="@string/local_data_hint" android:layout_marginTop="24dp" android:gravity="center" />
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</LinearLayout>
