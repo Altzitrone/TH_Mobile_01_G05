@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+  <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+    <LinearLayout style="@style/PageContent">
+      <TextView style="@style/SectionLabel" android:text="@string/student_section" />
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/codeInput" style="@style/InputField" android:hint="@string/student_code">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapCharacters" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/nameInput" style="@style/InputField" android:hint="@string/fullname">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapWords" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/emailInput" style="@style/InputField" android:hint="@string/email">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textEmailAddress" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/phoneInput" style="@style/InputField" android:hint="@string/phone">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="phone" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <TextView style="@style/SectionLabel" android:text="@string/account_section" />
+      <TextView style="@style/PageBody" android:text="@string/account_hint" android:layout_marginBottom="16dp" />
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/usernameInput" style="@style/InputField" android:hint="@string/username">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textVisiblePassword" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/passwordInput" style="@style/InputField" android:hint="@string/password" app:endIconMode="password_toggle" app:helperText="@string/password_help">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textPassword" android:maxLength="200" android:saveEnabled="false" android:importantForAutofill="no" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.button.MaterialButton android:id="@+id/saveButton" style="@style/PrimaryButton" android:text="@string/save" />
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</LinearLayout>

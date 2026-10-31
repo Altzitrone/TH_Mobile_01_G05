@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/PageRoot" android:orientation="vertical">
+  <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" />
+  <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+    <LinearLayout style="@style/PageContent">
+      <TextView style="@style/SectionLabel" android:text="@string/subject_section" />
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/codeInput" style="@style/InputField" android:hint="@string/subject_code">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapCharacters" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/nameInput" style="@style/InputField" android:hint="@string/subject_name">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textCapSentences" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/creditsInput" style="@style/InputField" android:hint="@string/credits">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:maxLength="200" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputLayout android:id="@+id/descriptionInput" style="@style/InputField" android:hint="@string/description">
+        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="textMultiLine" android:maxLength="2000" />
+      </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.button.MaterialButton android:id="@+id/saveButton" style="@style/PrimaryButton" android:text="@string/save" />
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</LinearLayout>
